@@ -1,3 +1,4 @@
+import { ProductDetailScreen } from './../screens/shop/ProductDetailScreen';
 import { createStackNavigator } from 'react-navigation-stack';
 import { ProductsOverviewScreen } from './../screens/shop/ProductsOverviewScreen';
 
@@ -7,7 +8,8 @@ import { createAppContainer } from 'react-navigation';
 
 
 const ProductNavigator = createStackNavigator({
-    ProductsOverview: ProductsOverviewScreen
+    ProductsOverview: ProductsOverviewScreen,
+    ProductDetail: ProductDetailScreen
 }, {
     defaultNavigationOptions: {
         headerStyle: {
