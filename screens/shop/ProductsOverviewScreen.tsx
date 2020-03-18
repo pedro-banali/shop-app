@@ -1,13 +1,15 @@
 import React, { FC } from 'react';
 import { FlatList, View, Text } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { availableProductsAsList } from '../../store/selectors/products.selectors';
 import { ProductItem } from '../../components/shop/ProductItem';
 import { NavigationParams, NavigationNavigatorProps } from 'react-navigation';
+import * as cardActions from '../../store/actions/cart.actions';
 
 export const ProductsOverviewScreen: FC<NavigationParams> &
   NavigationNavigatorProps = ({ navigation }) => {
   const products = useSelector(availableProductsAsList);
+  const dispatch = useDispatch();
   return (
     <FlatList
       data={products}
@@ -17,7 +19,9 @@ export const ProductsOverviewScreen: FC<NavigationParams> &
           title={item.title}
           price={item.price}
           image={item.imageUrl}
-          onAddToCart={() => {}}
+          onAddToCart={() => {
+            dispatch(cardActions.addToCart(item));
+          }}
           viewDetails={() => {
             navigation.navigate('ProductDetail', {
               productId: item.id,

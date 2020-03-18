@@ -1,3 +1,4 @@
+import { TitleText } from './../../foodFinder/components/TitleText';
 import { ProductDetailScreen } from './../screens/shop/ProductDetailScreen';
 import { createStackNavigator } from 'react-navigation-stack';
 import { ProductsOverviewScreen } from './../screens/shop/ProductsOverviewScreen';
@@ -8,12 +9,23 @@ import { createAppContainer } from 'react-navigation';
 
 
 const ProductNavigator = createStackNavigator({
-    ProductsOverview: ProductsOverviewScreen,
+    ProductsOverview: {
+        screen: ProductsOverviewScreen,
+        navigationOptions: {
+            headerTitle: 'All Products'
+        }
+    },
     ProductDetail: ProductDetailScreen
 }, {
     defaultNavigationOptions: {
         headerStyle: {
             backgroundColor: Platform.OS === 'android' ? Colors.primary : ''
+        },
+        headerTitleStyle: {
+            fontFamily: 'open-sans-bold',
+        },
+        headerBackTitleStyle: {
+            fontFamily: 'open-sans',
         },
         headerTintColor: Platform.OS === 'android' ? Colors.contrastPrimary : Colors.primary
     }
