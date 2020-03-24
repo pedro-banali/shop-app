@@ -1,3 +1,4 @@
+import { CartScreen } from './../screens/shop/CartScreen';
 import { TitleText } from './../../foodFinder/components/TitleText';
 import { ProductDetailScreen } from './../screens/shop/ProductDetailScreen';
 import { createStackNavigator } from 'react-navigation-stack';
@@ -15,7 +16,8 @@ const ProductNavigator = createStackNavigator({
             headerTitle: 'All Products'
         }
     },
-    ProductDetail: ProductDetailScreen
+    ProductDetail: ProductDetailScreen,
+    Cart: CartScreen
 }, {
     defaultNavigationOptions: {
         headerStyle: {

@@ -1,10 +1,12 @@
 import React, { FC } from 'react';
-import { FlatList, View, Text } from 'react-native';
+import { FlatList, View, Text, Platform } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { availableProductsAsList } from '../../store/selectors/products.selectors';
 import { ProductItem } from '../../components/shop/ProductItem';
 import { NavigationParams, NavigationNavigatorProps } from 'react-navigation';
 import * as cardActions from '../../store/actions/cart.actions';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import { CustomHeaderButton } from '../../components/UI/HeaderButton';
 
 export const ProductsOverviewScreen: FC<NavigationParams> &
   NavigationNavigatorProps = ({ navigation }) => {
@@ -32,4 +34,21 @@ export const ProductsOverviewScreen: FC<NavigationParams> &
       )}
     />
   );
+};
+
+ProductsOverviewScreen.navigationOptions = ({ navigation }) => {
+  return {
+    headerTitle: 'All Products',
+    headerRight: () => (
+      <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+        <Item
+          title='Cart'
+          iconName={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
+          onPress={() => {
+            navigation.navigate('Cart');
+          }}
+        />
+      </HeaderButtons>
+    )
+  };
 };
