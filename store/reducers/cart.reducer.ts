@@ -5,6 +5,7 @@ import { Product } from '../../models/product.class';
 import { HashMap } from '../../shared/HashMap';
 import { IProduct } from '../../models/iproduct';
 import { ADD_TO_CART } from '../actions/cart.actions';
+import { ADD_ORDER } from '../actions/order.actions';
 
 export interface CartItem extends IProduct {
     totalPrice: number;
@@ -77,6 +78,8 @@ export default (state: CartState = initialState, action: AnyAction) => {
             };
 
         }
+        case ADD_ORDER:
+            return initialState;
         default:
             return state;
     }
