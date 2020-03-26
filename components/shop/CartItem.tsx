@@ -7,9 +7,14 @@ import { CartItem } from '../../store/reducers/cart.reducer';
 interface Props {
   onRemove: (pid: string) => void;
   cartItem: CartItem;
+  isAbleToDelete?: boolean;
 }
 
-export const CartItemComponent: FC<Props> = ({ onRemove, cartItem }) => {
+export const CartItemComponent: FC<Props> = ({
+  onRemove,
+  cartItem,
+  isAbleToDelete
+}) => {
   return (
     <View style={styles.cartItem}>
       <View style={styles.itemData}>
@@ -18,16 +23,18 @@ export const CartItemComponent: FC<Props> = ({ onRemove, cartItem }) => {
       </View>
       <View style={styles.itemData}>
         <Text style={styles.mainText}>{cartItem.totalPrice.toFixed(2)}</Text>
-        <TouchableOpacity
-          onPress={() => onRemove(cartItem.id)}
-          style={styles.deleteButton}
-        >
-          <Ionicons
-            name={Platform.OS === 'android' ? 'md-trash' : 'ios-trash'}
-            size={23}
-            color='red'
-          />
-        </TouchableOpacity>
+        {isAbleToDelete && (
+          <TouchableOpacity
+            onPress={() => onRemove(cartItem.id)}
+            style={styles.deleteButton}
+          >
+            <Ionicons
+              name={Platform.OS === 'android' ? 'md-trash' : 'ios-trash'}
+              size={23}
+              color='red'
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

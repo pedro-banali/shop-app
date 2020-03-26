@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { OrderState } from '../../store/reducers/order.reducer';
-import { FlatList, Text, Platform } from 'react-native';
+import { FlatList, Platform } from 'react-native';
 import { NavigationParams, NavigationNavigatorProps } from 'react-navigation';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { CustomHeaderButton } from '../../components/UI/HeaderButton';
+import { OrderItem } from '../../components/shop/OrderItem';
 
 interface Props {}
 
@@ -17,7 +18,9 @@ export const OrderScreen: FC<Props & NavigationParams> &
     <FlatList
       data={orders}
       keyExtractor={item => item.id}
-      renderItem={({ item }) => <Text>{item.orderTotal}</Text>}
+      renderItem={({ item }) => (
+        <OrderItem amount={item.orderTotal} items={item.orderItems} date={item.orderDate} />
+      )}
     />
   );
 };

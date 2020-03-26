@@ -44,6 +44,7 @@ export const CartScreen: FC<NavigationParams> &
         keyExtractor={item => item.id}
         renderItem={({ item }: { item: CartItem }) => (
           <CartItemComponent
+            isAbleToDelete
             cartItem={item}
             onRemove={(pid: string) => {
               dispatch(cartActions.removeFromCart(pid));
