@@ -6,6 +6,7 @@ import { HashMap } from '../../shared/HashMap';
 import { IProduct } from '../../models/iproduct';
 import { ADD_TO_CART } from '../actions/cart.actions';
 import { ADD_ORDER } from '../actions/order.actions';
+import { DELETE_PRODUCT } from '../actions/products.actions';
 
 export interface CartItem extends IProduct {
     totalPrice: number;
@@ -78,6 +79,18 @@ export default (state: CartState = initialState, action: AnyAction) => {
             };
 
         }
+        case DELETE_PRODUCT:
+            console.log(state.items);
+            if (!state.items[action.payload.productId]) {
+                return state;
+            }
+            const { [action.payload.productId]: deleted, ...updatedItems } = state.items;
+            console.log(deleted, updatedItems);
+            return {
+                ...state,
+                items: updatedItems,
+                totalAmount: state.totalAmount - deleted.totalPrice
+            };
         case ADD_ORDER:
             return initialState;
         default:

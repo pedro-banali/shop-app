@@ -11,6 +11,7 @@ import { Platform } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import { Ionicons } from '@expo/vector-icons';
 import { UserProductScreen } from '../screens/user/UserProductsScreen';
+import { EditProductScreen } from '../screens/user/EditProductScreen';
 
 const defaultNavigationOptions = {
   headerStyle: {
@@ -71,7 +72,8 @@ const OrdersNavigator = createStackNavigator(
 
 const AdminNavigator = createStackNavigator(
   {
-    UserProduct: UserProductScreen
+    UserProduct: UserProductScreen,
+    EditProduct: EditProductScreen
   },
   {
     navigationOptions: {

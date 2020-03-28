@@ -4,5 +4,6 @@ export default {
     mildBrown: '#CC8434',
     darkBrown: '#CC8434',
     green: '#94AE28',
+    alert: '#F31431'
 
 }

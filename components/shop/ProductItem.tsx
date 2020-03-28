@@ -15,9 +15,8 @@ export const ProductItem: FC<{
   image: string;
   title: string;
   price: number;
-  viewDetails: () => void;
-  onAddToCart: () => void;
-}> = ({ image, title, price, viewDetails, onAddToCart }) => {
+  onSelect: () => void;
+}> = ({ image, title, price, onSelect, children }) => {
   let TouchableWorkaround = TouchableOpacity;
   if (Platform.OS === 'android' && Platform.Version >= 21) {
     TouchableWorkaround = TouchableNativeFeedback;
@@ -25,7 +24,7 @@ export const ProductItem: FC<{
   return (
     <View style={styles.product}>
       <View style={styles.touchable}>
-        <TouchableWorkaround onPress={viewDetails} useForeground>
+        <TouchableWorkaround onPress={onSelect} useForeground>
           <View>
             <View style={styles.imageContainer}>
               <Image style={styles.image} source={{ uri: image }} />
@@ -34,18 +33,7 @@ export const ProductItem: FC<{
               <Text style={styles.title}>{title}</Text>
               <Text style={styles.price}>$ {price.toFixed(2)}</Text>
             </View>
-            <View style={styles.actions}>
-              <Button
-                color={Colors.darkBrown}
-                title='View Details'
-                onPress={viewDetails}
-              />
-              <Button
-                color={Colors.green}
-                title='To Cart'
-                onPress={onAddToCart}
-              />
-            </View>
+            <View style={styles.actions}>{children}</View>
           </View>
         </TouchableWorkaround>
       </View>
@@ -82,7 +70,7 @@ const styles = StyleSheet.create({
   },
   details: {
     alignItems: 'center',
-    height: '15%',
+    height: '17%',
     padding: 10
   },
   title: {
@@ -99,7 +87,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: '25%',
+    height: '23%',
     paddingHorizontal: 20
   }
 });
