@@ -5,6 +5,7 @@ import moment from 'moment';
 import { HashMap } from '../../shared/HashMap';
 import { CartItem } from '../../store/reducers/cart.reducer';
 import { CartItemComponent } from './CartItem';
+import { Card } from '../UI/Card';
 
 interface Props {
   amount: number;
@@ -23,7 +24,7 @@ export const OrderItem: FC<Props> = ({ amount, date, items }) => {
   const newDate = moment(new Date(date)).format('MMMM Do YYYY, hh:mm');
   const [showDetail, setShowDetails] = useState(false);
   return (
-    <View style={styles.orderItem}>
+    <Card style={styles.orderItem}>
       <View style={styles.summary}>
         <Text style={styles.totalAmount}>{amount.toFixed(2)}</Text>
         <Text style={styles.date}>{newDate}</Text>
@@ -46,19 +47,12 @@ export const OrderItem: FC<Props> = ({ amount, date, items }) => {
           ))}
         </View>
       )}
-    </View>
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
   orderItem: {
-    shadowColor: '#000',
-    shadowOpacity: 0.26,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 5,
-    borderRadius: 10,
-    backgroundColor: '#fff',
     margin: 20,
     padding: 10,
     alignItems: 'center'

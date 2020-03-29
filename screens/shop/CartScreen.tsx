@@ -7,6 +7,7 @@ import { CartItemComponent } from '../../components/shop/CartItem';
 import * as cartActions from '../../store/actions/cart.actions';
 import * as ordersActions from '../../store/actions/order.actions';
 import { NavigationParams, NavigationNavigatorProps } from 'react-navigation';
+import { Card } from '../../components/UI/Card';
 
 export const CartScreen: FC<NavigationParams> &
   NavigationNavigatorProps = () => {
@@ -26,7 +27,7 @@ export const CartScreen: FC<NavigationParams> &
   const dispatch = useDispatch();
   return (
     <View style={styles.screen}>
-      <View style={styles.summary}>
+      <Card style={styles.summary}>
         <Text style={styles.summaryText}>
           Total:
           <Text style={styles.amount}>
@@ -41,7 +42,7 @@ export const CartScreen: FC<NavigationParams> &
           }}
           disabled={cartItems.length === 0}
         />
-      </View>
+      </Card>
       <FlatList
         data={cartItems}
         keyExtractor={item => item.id}
@@ -73,12 +74,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     margin: 20,
     padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.26,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 5,
-    borderRadius: 10
   },
   summaryText: {
     fontFamily: 'open-sans-bold',

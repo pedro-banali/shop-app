@@ -80,12 +80,10 @@ export default (state: CartState = initialState, action: AnyAction) => {
 
         }
         case DELETE_PRODUCT:
-            console.log(state.items);
             if (!state.items[action.payload.productId]) {
                 return state;
             }
             const { [action.payload.productId]: deleted, ...updatedItems } = state.items;
-            console.log(deleted, updatedItems);
             return {
                 ...state,
                 items: updatedItems,

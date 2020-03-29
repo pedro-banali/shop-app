@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Colors from '../../constants/Colors';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Card } from '../UI/Card';
 
 export const ProductItem: FC<{
   image: string;
@@ -22,7 +23,7 @@ export const ProductItem: FC<{
     TouchableWorkaround = TouchableNativeFeedback;
   }
   return (
-    <View style={styles.product}>
+    <Card style={styles.product}>
       <View style={styles.touchable}>
         <TouchableWorkaround onPress={onSelect} useForeground>
           <View>
@@ -37,19 +38,12 @@ export const ProductItem: FC<{
           </View>
         </TouchableWorkaround>
       </View>
-    </View>
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
   product: {
-    shadowColor: '#000',
-    shadowOpacity: 0.26,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 5,
-    borderRadius: 10,
-    backgroundColor: '#fff',
     height: 300,
     margin: 20
   },
