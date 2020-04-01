@@ -1,5 +1,13 @@
-import React, { FC } from 'react';
-import { FlatList, View, Text, Platform, Button } from 'react-native';
+import React, { FC, useEffect, useState } from 'react';
+import {
+  FlatList,
+  View,
+  Text,
+  Platform,
+  Button,
+  ActivityIndicator,
+  StyleSheet
+} from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { availableProductsAsList } from '../../store/selectors/products.selectors';
 import { ProductItem } from '../../components/shop/ProductItem';
@@ -8,17 +16,43 @@ import * as cardActions from '../../store/actions/cart.actions';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { CustomHeaderButton } from '../../components/UI/HeaderButton';
 import Colors from '../../constants/Colors';
+import * as productActions from '../../store/actions/products.actions';
 
 export const ProductsOverviewScreen: FC<NavigationParams> &
   NavigationNavigatorProps = ({ navigation }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const products = useSelector(availableProductsAsList);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setIsLoading(true);
+
+      await dispatch(productActions.fetchProducts());
+      setIsLoading(false);
+    };
+    loadProducts();
+  }, [dispatch]);
+
   const selectItemHandler = (id: string, title: string) => {
     navigation.navigate('ProductDetail', {
       productId: id,
       productTitle: title
     });
   };
+
+  if (isLoading) {
+    <View style={styles.centered}>
+      <ActivityIndicator size='large' color={Colors.green} />
+    </View>;
+  }
+
+  if (!isLoading && products.length === 0) {
+    <View style={styles.centered}>
+      <Text>No products found, Maybe start adding some!</Text>
+    </View>;
+  }
+
   return (
     <FlatList
       data={products}
@@ -75,3 +109,11 @@ ProductsOverviewScreen.navigationOptions = ({ navigation }) => {
     )
   };
 };
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
+});

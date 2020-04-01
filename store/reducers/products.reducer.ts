@@ -1,5 +1,5 @@
 import { availableProductsAsList } from './../selectors/products.selectors';
-import { CREATE_PRODUCT, UPDATE_PRODUCT } from './../actions/products.actions';
+import { CREATE_PRODUCT, UPDATE_PRODUCT, SET_PRODUCTS } from './../actions/products.actions';
 import { HASHED_PRODUCTS, HASHED_PRODUCTS_BY_OWNER_ID } from './../../data/dummy-data';
 import { AnyAction } from 'redux';
 import { Product } from '../../models/product.class';
@@ -13,16 +13,24 @@ export interface ProductState {
     userProducts: HashMap<Product>;
 }
 const initialState: ProductState = {
-    availableProducts: HASHED_PRODUCTS,
-    userProducts: HASHED_PRODUCTS_BY_OWNER_ID('u1')
+    // availableProducts: HASHED_PRODUCTS,
+    // userProducts: HASHED_PRODUCTS_BY_OWNER_ID('u1')
+    availableProducts: {},
+    userProducts: {}
 };
 
 export default (state = initialState, action: AnyAction) => {
     switch (action.type) {
+        case SET_PRODUCTS:
+            const { products } = action.payload;
+            return {
+                ...state,
+                availableProducts: products,
+            };
         case CREATE_PRODUCT:
             const { product: newProductData } = action.payload;
             const newCreatedProduct = {
-                id: Date.now().toString(),
+                id: newProductData.id,
                 ownerId: 'u1',
                 title: newProductData.title,
                 description: newProductData.description,
@@ -56,6 +64,8 @@ export default (state = initialState, action: AnyAction) => {
             const { [action.payload.productId]: userProductRemoved, ...userProducts } = state.userProducts;
             const { [action.payload.productId]: availableProductRemoved, ...availableProducts } = state.availableProducts;
             return { ...state, userProducts, availableProducts };
+
+        default:
+            return state;
     };
-    return state;
 };
