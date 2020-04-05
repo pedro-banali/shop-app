@@ -10,18 +10,35 @@ export const SET_PRODUCTS = 'SET_PRODUCTS';
 
 export const fetchProducts = () => {
     return async dispatch => {
-        const response = await fetch('https://shopapp-3d9df.firebaseio.com/products.json');
-        const resData: HashMap<Product> = await response.json();
-        Object.keys(resData).forEach(key => {
-            resData[key].id = key;
-            resData[key].ownerId = 'u1';
-        });
+        try {
+            const response = await fetch('https://shopapp-3d9df.firebaseio.com/products.json');
+            const resData = await response.json();
 
-        dispatch({
-            type: SET_PRODUCTS, payload: {
-                products: resData
+            if (!response.ok) {
+                throw new Error('Something went wrong');
             }
-        });
+
+            if (resData === null) {
+                return dispatch({
+                    type: SET_PRODUCTS, payload: {
+                        products: {}
+                    }
+                });
+
+            }
+            Object.keys(resData).forEach(key => {
+                resData[key].id = key;
+                resData[key].ownerId = 'u1';
+            });
+
+            return dispatch({
+                type: SET_PRODUCTS, payload: {
+                    products: resData
+                }
+            });
+        } catch (e) {
+            throw e;
+        }
     };
 };
 
@@ -43,14 +60,36 @@ export const createProduct = ({ title, description, imageUrl, price }: Partial<P
 };
 
 export const updateProduct = ({ id, title, description, imageUrl }: Partial<Product>) => {
-    return {
-        type: UPDATE_PRODUCT, payload: {
-            id,
-            product: { title, description, imageUrl }
+    return async (dispatch) => {
+        const product = { title, description, imageUrl };
+        const response = await fetch(`https://shopapp-3d9df.firebaseio.com/products/${id}.json`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(product)
+        });
+
+        if(!response.ok) {
+            throw new Error('Something went wrong!');
         }
+
+        dispatch({
+            type: UPDATE_PRODUCT, payload: {
+                id,
+                product: { title, description, imageUrl }
+            }
+        });
     };
 };
 
 export const deleteProduct = (productId: string) => {
-    return { type: DELETE_PRODUCT, payload: { productId } };
+    return async (dispatch) => {
+
+        await fetch(`https://shopapp-3d9df.firebaseio.com/products/${productId}.json`, {
+            method: 'DELETE'
+        });
+
+        dispatch({ type: DELETE_PRODUCT, payload: { productId } });
+    };
 }; 

@@ -1,7 +1,7 @@
 import { AnyAction } from 'redux';
 import { HashMap } from '../../shared/HashMap';
 import { Order } from '../../models/order';
-import { ADD_ORDER } from '../actions/order.actions';
+import { ADD_ORDER, SET_ORDERS } from '../actions/order.actions';
 
 export interface OrderState {
     orders: HashMap<Order>;
@@ -20,6 +20,9 @@ export default (state = initialState, action: AnyAction) => {
                     [action.orderData.id]: action.orderData
                 }
             };
+        case SET_ORDERS: {
+            return { ...state, orders: action.payload.orders };
+        }
     }
     return state;
 };

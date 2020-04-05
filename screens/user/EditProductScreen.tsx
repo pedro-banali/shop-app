@@ -1,11 +1,12 @@
-import React, { FC, useCallback, useEffect, useReducer } from 'react';
+import React, { FC, useCallback, useEffect, useReducer, useState } from 'react';
 import {
   Platform,
   ScrollView,
   StyleSheet,
   KeyboardAvoidingView,
   View,
-  Alert
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { NavigationNavigatorProps, NavigationParams } from 'react-navigation';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
@@ -14,6 +15,7 @@ import { CustomHeaderButton } from '../../components/UI/HeaderButton';
 import * as productActions from '../../store/actions/products.actions';
 import { ProductState } from '../../store/reducers/products.reducer';
 import { Input } from '../../components/UI/Input';
+import Colors from '../../constants/Colors';
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 
@@ -43,21 +45,21 @@ const formReducer = (
   if (action.type === FORM_INPUT_UPDATE) {
     const updatedValues = {
       ...state.inputValues,
-      [action.payload.input]: action.payload.value
+      [action.payload.input]: action.payload.value,
     };
     const updatedValidities = {
       ...state.inputValidities,
-      [action.payload.input]: action.payload.isValid
+      [action.payload.input]: action.payload.isValid,
     };
     let updatedFormIsValid = true;
-    Object.keys(updatedValidities).forEach(key => {
+    Object.keys(updatedValidities).forEach((key) => {
       updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
     });
     return {
       ...state,
       inputValues: updatedValues,
       inputValidities: updatedValidities,
-      formIsValid: updatedFormIsValid
+      formIsValid: updatedFormIsValid,
     };
   }
   return state;
@@ -67,56 +69,75 @@ interface Props {}
 
 export const EditProductScreen: FC<Props & NavigationParams> &
   NavigationNavigatorProps = ({ navigation }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
+
   const productId = navigation.getParam('productId');
+
   const editedProduct = useSelector(
     ({ product }: { product: ProductState }) =>
       product.availableProducts[productId]
   );
+
   const dispatch = useDispatch();
+
   const [formState, dispatchFormState] = useReducer(formReducer, {
     inputValues: {
       title: editedProduct ? editedProduct.title : '',
       imageUrl: editedProduct ? editedProduct.imageUrl : '',
       description: editedProduct ? editedProduct.description : '',
-      price: ''
+      price: '',
     },
     inputValidities: {
       title: editedProduct ? true : false,
       imageUrl: editedProduct ? true : false,
       description: editedProduct ? true : false,
-      price: editedProduct ? true : false
+      price: editedProduct ? true : false,
     },
-    formIsValid: editedProduct ? true : false
+    formIsValid: editedProduct ? true : false,
   });
 
-  const submitHandler = useCallback(() => {
+  useEffect(() => {
+    if (error) {
+      Alert.alert('An error occurred!', error, [{ text: 'Okay' }]);
+    }
+  }, [error]);
+
+  const submitHandler = useCallback(async () => {
     if (!formState.formIsValid) {
       Alert.alert('Wrong input!!', 'Please check the errors in the form', [
-        { text: 'Okay' }
+        { text: 'Okay' },
       ]);
       return;
     }
-    if (editedProduct) {
-      dispatch(
-        productActions.updateProduct({
-          id: productId,
-          title: formState.inputValues.title,
-          description: formState.inputValues.description,
-          imageUrl: formState.inputValues.imageUrl
-        })
-      );
-    } else {
-      const princeNumber = parseFloat(formState.inputValues.price);
-      dispatch(
-        productActions.createProduct({
-          title: formState.inputValues.title,
-          description: formState.inputValues.description,
-          imageUrl: formState.inputValues.imageUrl,
-          price: princeNumber
-        })
-      );
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (editedProduct) {
+        await dispatch(
+          productActions.updateProduct({
+            id: productId,
+            title: formState.inputValues.title,
+            description: formState.inputValues.description,
+            imageUrl: formState.inputValues.imageUrl,
+          })
+        );
+      } else {
+        const princeNumber = parseFloat(formState.inputValues.price);
+        await dispatch(
+          productActions.createProduct({
+            title: formState.inputValues.title,
+            description: formState.inputValues.description,
+            imageUrl: formState.inputValues.imageUrl,
+            price: princeNumber,
+          })
+        );
+      }
+      navigation.goBack();
+    } catch (error) {
+      setError(error.message);
     }
-    navigation.goBack();
+    setIsLoading(false);
   }, [dispatch, productId, formState]);
 
   useEffect(() => {
@@ -127,11 +148,19 @@ export const EditProductScreen: FC<Props & NavigationParams> &
     (input: string, value: string, isValid: boolean) => {
       dispatchFormState({
         type: FORM_INPUT_UPDATE,
-        payload: { value, isValid, input }
+        payload: { value, isValid, input },
       });
     },
     [dispatchFormState]
   );
+
+  if (isLoading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size='large' color={Colors.green} />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -216,12 +245,17 @@ EditProductScreen.navigationOptions = ({ navigation }) => {
           onPress={submit}
         />
       </HeaderButtons>
-    )
+    ),
   };
 };
 
 const styles = StyleSheet.create({
   form: {
-    margin: 20
-  }
+    margin: 20,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

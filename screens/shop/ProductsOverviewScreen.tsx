@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState, useCallback } from 'react';
 import {
   FlatList,
   View,
@@ -6,7 +6,7 @@ import {
   Platform,
   Button,
   ActivityIndicator,
-  StyleSheet
+  StyleSheet,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { availableProductsAsList } from '../../store/selectors/products.selectors';
@@ -21,42 +21,80 @@ import * as productActions from '../../store/actions/products.actions';
 export const ProductsOverviewScreen: FC<NavigationParams> &
   NavigationNavigatorProps = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState();
   const products = useSelector(availableProductsAsList);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      setIsLoading(true);
-
+  const loadProducts = useCallback(async () => {
+    setError(null);
+    setIsRefreshing(true);
+    try {
       await dispatch(productActions.fetchProducts());
+    } catch (error) {
+      setError(error.message);
+    }
+    setIsRefreshing(false);
+  }, [dispatch, setIsLoading, setError]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    loadProducts().then(() => {
       setIsLoading(false);
+    });
+  }, [dispatch, loadProducts]);
+
+  useEffect(() => {
+    const willFocusSub = navigation.addListener('willFocus', () => {
+      loadProducts();
+    });
+    return () => {
+      willFocusSub.remove();
     };
-    loadProducts();
-  }, [dispatch]);
+  }, [loadProducts]);
 
   const selectItemHandler = (id: string, title: string) => {
     navigation.navigate('ProductDetail', {
       productId: id,
-      productTitle: title
+      productTitle: title,
     });
   };
 
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text>An error occurred!</Text>
+        <Button
+          title='Try again'
+          onPress={loadProducts}
+          color={Colors.primary}
+        />
+      </View>
+    );
+  }
+
   if (isLoading) {
-    <View style={styles.centered}>
-      <ActivityIndicator size='large' color={Colors.green} />
-    </View>;
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size='large' color={Colors.green} />
+      </View>
+    );
   }
 
   if (!isLoading && products.length === 0) {
-    <View style={styles.centered}>
-      <Text>No products found, Maybe start adding some!</Text>
-    </View>;
+    return (
+      <View style={styles.centered}>
+        <Text>No products found, Maybe start adding some!</Text>
+      </View>
+    );
   }
 
   return (
     <FlatList
+      onRefresh={loadProducts}
+      refreshing={isRefreshing}
       data={products}
-      keyExtractor={products => products.id}
+      keyExtractor={(products) => products.id}
       renderItem={({ item }) => (
         <ProductItem
           title={item.title}
@@ -106,7 +144,7 @@ ProductsOverviewScreen.navigationOptions = ({ navigation }) => {
           }}
         />
       </HeaderButtons>
-    )
+    ),
   };
 };
 
@@ -114,6 +152,6 @@ const styles = StyleSheet.create({
   centered: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
-  }
+    alignItems: 'center',
+  },
 });

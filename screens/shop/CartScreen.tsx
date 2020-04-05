@@ -1,5 +1,12 @@
-import React, { FC } from 'react';
-import { StyleSheet, View, Text, Button, FlatList } from 'react-native';
+import React, { FC, useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Button,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { CartState, CartItem } from '../../store/reducers/cart.reducer';
 import Colors from '../../constants/Colors';
@@ -15,16 +22,25 @@ export const CartScreen: FC<NavigationParams> &
     ({ cart }: { cart: CartState }) => cart.totalAmount
   );
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [cartItems, hashedCartItems, totalAmount] = useSelector(
     ({ cart }: { cart: CartState }) => [
       Object.keys(cart.items)
-        .map(id => cart.items[id])
+        .map((id) => cart.items[id])
         .sort((a, b) => (a.id > b.id ? 1 : -1)),
       cart.items,
-      cart.totalAmount
+      cart.totalAmount,
     ]
   );
   const dispatch = useDispatch();
+
+  const sendOrderHandler = async (pid: string) => {
+    setIsLoading(true);
+    await dispatch(cartActions.removeFromCart(pid));
+    setIsLoading(false);
+  };
+
   return (
     <View style={styles.screen}>
       <Card style={styles.summary}>
@@ -34,25 +50,28 @@ export const CartScreen: FC<NavigationParams> &
             ${Math.round((cartTotalAmount * 100) / 100).toFixed(2)}
           </Text>
         </Text>
-        <Button
-          title='Order now'
-          color={Colors.green}
-          onPress={() => {
-            dispatch(ordersActions.addOrder(hashedCartItems, totalAmount));
-          }}
-          disabled={cartItems.length === 0}
-        />
+
+        {isLoading ? (
+          <ActivityIndicator size='small' color={Colors.green} />
+        ) : (
+          <Button
+            title='Order now'
+            color={Colors.green}
+            onPress={() => {
+              dispatch(ordersActions.addOrder(hashedCartItems, totalAmount));
+            }}
+            disabled={cartItems.length === 0}
+          />
+        )}
       </Card>
       <FlatList
         data={cartItems}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }: { item: CartItem }) => (
           <CartItemComponent
             isAbleToDelete
             cartItem={item}
-            onRemove={(pid: string) => {
-              dispatch(cartActions.removeFromCart(pid));
-            }}
+            onRemove={sendOrderHandler}
           />
         )}
       />
@@ -61,12 +80,12 @@ export const CartScreen: FC<NavigationParams> &
 };
 
 CartScreen.navigationOptions = {
-  headerTitle: 'Your Cart'
+  headerTitle: 'Your Cart',
 };
 
 const styles = StyleSheet.create({
   screen: {
-    margin: 20
+    margin: 20,
   },
   summary: {
     flexDirection: 'row',
@@ -77,9 +96,9 @@ const styles = StyleSheet.create({
   },
   summaryText: {
     fontFamily: 'open-sans-bold',
-    fontSize: 18
+    fontSize: 18,
   },
   amount: {
-    color: Colors.darkBrown
-  }
+    color: Colors.darkBrown,
+  },
 });

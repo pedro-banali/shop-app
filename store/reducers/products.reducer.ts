@@ -26,6 +26,9 @@ export default (state = initialState, action: AnyAction) => {
             return {
                 ...state,
                 availableProducts: products,
+                userProducts: Object.keys(products).filter(key => products[key].ownerId === 'u1').reduce((previous, key) => {
+                    return { ...previous, [key]: products[key] } as HashMap<Product>;
+                }, {} as HashMap<Product>)
             };
         case CREATE_PRODUCT:
             const { product: newProductData } = action.payload;

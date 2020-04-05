@@ -27,6 +27,7 @@ export const OrderItem: FC<Props> = ({ amount, date, items }) => {
     <Card style={styles.orderItem}>
       <View style={styles.summary}>
         <Text style={styles.totalAmount}>{amount.toFixed(2)}</Text>
+        {/* <Text style={styles.date}>{date}</Text> */}
         <Text style={styles.date}>{newDate}</Text>
       </View>
       <Button
